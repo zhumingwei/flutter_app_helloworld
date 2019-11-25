@@ -26,12 +26,13 @@ class MyView extends StatelessWidget {
       appBar: AppBar(
         title: Text("title"),
       ),
-      body: ListView.builder(
-        itemCount: 100,
-          itemExtent: 50.0,
+      body: ListView.separated(
+          itemCount: 100,
           //itemExtent 并不是一个必填参数。但强烈建议你提前设置好这个参数的值,避免频繁计算
           itemBuilder: (BuildContext context, int index) =>
               ListTile(title: Text("title $index"),subtitle: Text("body $index"),),
+          separatorBuilder: (BuildContext context,int index)=>
+            index %2 ==0? Divider(color: Colors.green) : Divider(color: Colors.red),
       ),
     );
   }
