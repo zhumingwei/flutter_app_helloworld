@@ -34,15 +34,12 @@ class MyView extends StatelessWidget{
       appBar: AppBar(
         title: Text("title"),
       ),
-      body: Center(
-        child: FlatButton(
-          color:Colors.yellow,
-          shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-          colorBrightness: Brightness.dark,
-          textColor: Colors.blue,
-          onPressed: ()=> print("FlatButton pressed"),
-          child: Row(children: <Widget>[Icon(Icons.add),Text("Add")],),
-        ),
+      body: ListView(
+        children: <Widget>[
+          ListTile(leading: Icon(Icons.map),title: Text('Map')),
+          ListTile(leading: Icon(Icons.mail),title: Text('Mail'),),
+          ListTile(leading: Icon(Icons.message),title: Text('Message'),)
+        ],
       ),
     );
   }
