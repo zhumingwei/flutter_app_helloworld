@@ -27,13 +27,13 @@ class MyView extends StatelessWidget {
         title: Text("title"),
       ),
       body: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          Expanded(
-            flex: 1,
-            child: Container(
-              color: Colors.yellow,
-              height: 60,
-            ),
+          Container(
+            color: Colors.yellow,
+            height: 80,
+            width: 60,
           ),
           Container(
             color: Colors.red,
@@ -45,12 +45,10 @@ class MyView extends StatelessWidget {
             width: 60,
             height: 80,
           ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              color: Colors.green,
-              height: 60,
-            ),
+          Container(
+            color: Colors.green,
+            width: 60,
+            height: 80,
           ),
         ],
       ),
