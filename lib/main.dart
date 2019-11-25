@@ -26,30 +26,19 @@ class MyView extends StatelessWidget {
       appBar: AppBar(
         title: Text("title"),
       ),
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Container(
-            color: Colors.yellow,
-            height: 80,
-            width: 60,
+      body: Stack(
+        children: <Widget>[
+          Container(color: Colors.yellow,width: 300,height: 300,),
+          Positioned(
+            left: 18,
+            top: 18,
+            child: Container(color: Colors.green,width: 50,height: 50,),
           ),
-          Container(
-            color: Colors.red,
-            width: 100,
-            height: 180,
-          ),
-          Container(
-            color: Colors.black,
-            width: 60,
-            height: 80,
-          ),
-          Container(
-            color: Colors.green,
-            width: 60,
-            height: 80,
-          ),
+          Positioned(
+            left: 18,
+            top: 70,
+            child: Text("stack提供了层叠布局的容器"),
+          )
         ],
       ),
     );
