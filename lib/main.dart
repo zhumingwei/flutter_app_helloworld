@@ -26,8 +26,33 @@ class MyView extends StatelessWidget {
       appBar: AppBar(
         title: Text("title"),
       ),
-      body: Center(
-        child: Text('hello'),
+      body: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: Container(
+              color: Colors.yellow,
+              height: 60,
+            ),
+          ),
+          Container(
+            color: Colors.red,
+            width: 100,
+            height: 180,
+          ),
+          Container(
+            color: Colors.black,
+            width: 60,
+            height: 80,
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              color: Colors.green,
+              height: 60,
+            ),
+          ),
+        ],
       ),
     );
   }
