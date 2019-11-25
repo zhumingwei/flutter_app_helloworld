@@ -52,7 +52,7 @@ class _ParentState extends State<Parent>{
   @override
   void deactivate() {
     super.deactivate();
-    print('page2 parent dispose......');
+    print('page2 parent deactivate......');
   }
 
   @override

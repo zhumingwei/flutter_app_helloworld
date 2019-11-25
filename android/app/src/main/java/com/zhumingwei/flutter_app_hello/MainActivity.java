@@ -1,4 +1,4 @@
-package com.zhumingwei.flutter_app_helloworld;
+package com.zhumingwei.flutter_app_hello;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;
