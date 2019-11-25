@@ -26,17 +26,12 @@ class MyView extends StatelessWidget {
       appBar: AppBar(
         title: Text("title"),
       ),
-      body: ListView(
-        scrollDirection: Axis.horizontal,
-        itemExtent: 140,
-        children: <Widget>[
-          Container(color: Colors.black),
-          Container(color: Colors.red),
-          Container(color: Colors.blue),
-          Container(color: Colors.green),
-          Container(color: Colors.yellow),
-          Container(color: Colors.orange),
-        ],
+      body: ListView.builder(
+        itemCount: 100,
+          itemExtent: 50.0,
+          //itemExtent 并不是一个必填参数。但强烈建议你提前设置好这个参数的值,避免频繁计算
+          itemBuilder: (BuildContext context, int index) =>
+              ListTile(title: Text("title $index"),subtitle: Text("body $index"),),
       ),
     );
   }
