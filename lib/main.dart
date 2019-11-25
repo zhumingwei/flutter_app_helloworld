@@ -35,8 +35,13 @@ class MyView extends StatelessWidget{
         title: Text("title"),
       ),
       body: Center(
-        child: Image.network(
-        "https://is.gd/ePQGqe"
+        child: FlatButton(
+          color:Colors.yellow,
+          shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          colorBrightness: Brightness.dark,
+          textColor: Colors.blue,
+          onPressed: ()=> print("FlatButton pressed"),
+          child: Row(children: <Widget>[Icon(Icons.add),Text("Add")],),
         ),
       ),
     );
