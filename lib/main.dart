@@ -26,9 +26,8 @@ class MyView extends StatelessWidget {
       appBar: AppBar(
         title: Text("title"),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(44.0),
-        child: Text('Container（容器）在UI框架中是一个很常见的概念，Flutter也不例外。'),
+      body: Center(
+        child: Text('hello'),
       ),
     );
   }
