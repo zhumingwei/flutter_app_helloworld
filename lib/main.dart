@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -13,8 +14,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<StatefulWidget> {
-
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -45,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void initState() {
     super.initState();
-    _tabController = new TabController(length: 2, vsync: this);
+    _tabController = new TabController(length: 5, vsync: this);
   }
 
   @override
@@ -62,6 +61,18 @@ class _MyHomePageState extends State<MyHomePage>
             Tab(
               icon: Icon(Icons.cake),
               text: "自绘",
+            ),
+            Tab(
+              icon: Icon(Icons.home),
+              text: "指针事件",
+            ),
+            Tab(
+              icon: Icon(Icons.rss_feed),
+              text: "手势",
+            ),
+            Tab(
+              icon: Icon(Icons.perm_identity),
+              text: "手势冲突",
             )
           ],
           controller: _tabController,
@@ -89,7 +100,10 @@ class _MyHomePageState extends State<MyHomePage>
           ),
           Center(
             child: Cake(),
-          )
+          ),
+          ListenerWidget(),
+          DragWidget(),
+          DoubleGestureWidget(),
         ],
       ),
     );
@@ -99,6 +113,109 @@ class _MyHomePageState extends State<MyHomePage>
   void dispose() {
     _tabController?.dispose();
     super.dispose();
+  }
+}
+
+class DoubleGestureWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: RawGestureDetector(
+        gestures: {
+          MultipleTapGestureRecognizer: GestureRecognizerFactoryWithHandlers<
+              MultipleTapGestureRecognizer>(
+            () => MultipleTapGestureRecognizer(),
+            (MultipleTapGestureRecognizer instance) {
+              instance.onTap = () => print('parent tapped ');
+            },
+          )
+        },
+        child: Container(
+          color: Colors.pinkAccent,
+          child: Center(
+            child: GestureDetector(
+              child: Container(
+                color: Colors.blueAccent,
+                width: 200,
+                height: 200,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MultipleTapGestureRecognizer extends TapGestureRecognizer {
+  @override
+  void rejectGesture(int pointer) {
+    acceptGesture(pointer);
+  }
+}
+
+class DragWidget extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _DragState();
+  }
+}
+
+class _DragState extends State<DragWidget> {
+  double _top = 0.0;
+  double _left = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("demo"),
+      ),
+      body: Stack(
+        children: <Widget>[
+          Positioned(
+            top: _top,
+            left: _left,
+            child: GestureDetector(
+              child: Container(
+                color: Colors.red,
+                width: 50,
+                height: 50,
+              ),
+              onTap: () => print("tap"),
+              onDoubleTap: () => print("doubletap"),
+              onLongPress: () => print("Long press"),
+              onPanUpdate: ((e) {
+                setState(() {
+                  _left += e.delta.dx;
+                  _top += e.delta.dy;
+                });
+              }),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class ListenerWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Listener(
+        child: Container(
+          color: Colors.red,
+          width: 300,
+          height: 300,
+        ),
+        onPointerDown: (event) => print("down $event"),
+        onPointerMove: (event) => print("move $event"),
+        onPointerUp: (event) => print("up $event"),
+        onPointerCancel: (event) => print("cancel $event"),
+        onPointerEnter: (event) => print("enter $event"),
+      ),
+    );
   }
 }
 
