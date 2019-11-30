@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_hello/widget_animate_widget.dart';
+
+import 'builder_animate_widget.dart';
+import 'hero_transition.dart';
+import 'normal_animate_widget.dart';
 
 void main() => runApp(MyApp());
 
@@ -10,111 +15,13 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        routes: {
-          "second_page": (context) => SecondPage(),
-          "third_page": (context) => ThirdPage()
-        },
-        onUnknownRoute: (RouteSettings setting) =>
-            MaterialPageRoute(builder: (context) => UnknownPage()),
-        home: FirstPage());
+        home: MyHomePage());
   }
 }
 
-class FirstPage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _FirstPageState();
-  }
-}
-
-class _FirstPageState extends State<FirstPage> {
-  String _msg = '';
-
+class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('First Screen'),
-      ),
-      body: Column(
-        children: <Widget>[
-          RaisedButton(
-            child: Text('基本路由'),
-            onPressed: () => Navigator.push(
-                context, MaterialPageRoute(builder: (context) => SecondPage())),
-          ),
-          RaisedButton(
-            child: Text('命名路由'),
-            onPressed: () => Navigator.pushNamed(context, "second_page"),
-          ),
-          RaisedButton(
-            child: Text('命名路由(参数&回调)'),
-            onPressed: () =>
-                Navigator.pushNamed(context, "third_page", arguments: "Hey")
-                    .then((msg) {
-              setState(() {
-                _msg = msg;
-              });
-            }),
-          ),
-          Text('Message from Second screen: $_msg'),
-          RaisedButton(
-            onPressed: () => Navigator.pushNamed(context, "unknown_page"),
-            child: Text('命名路由异常处理'),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class SecondPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Second Screen'),
-      ),
-      body: RaisedButton(
-        child: Text('Back to first screen'),
-        onPressed: () => Navigator.pop(context),
-      ),
-    );
-  }
-}
-
-class UnknownPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Unknown Screen'),
-      ),
-      body: RaisedButton(
-        child: Text('Back'),
-        onPressed: () => Navigator.pop(context),
-      ),
-    );
-  }
-}
-
-class ThirdPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    String msg = ModalRoute.of(context).settings.arguments as String;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Third Screen'),
-      ),
-      body: Column(
-        children: <Widget>[
-          Text('Message from first screen: $msg'),
-          RaisedButton(
-            child: Text('back'),
-            onPressed: () => Navigator.pop(context, "Hi"),
-          )
-        ],
-      ),
-    );
+    return Page1();
   }
 }
