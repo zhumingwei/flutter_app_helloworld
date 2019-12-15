@@ -1,12 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
-
-import 'package:date_format/date_format.dart';
-import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -18,200 +16,136 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: MyHomePage(
-          title: "网络",
+          title: "Flutter Demo Home Page",
         ));
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
 
+  MyHomePage({this.title, Key key}) : super(key: key);
+
   @override
-  State<StatefulWidget> createState() {
-    return _MyHomePageState();
-  }
+  State<StatefulWidget> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  httpClientDemo() async {
-    try {
-      var httpClient = HttpClient();
-      httpClient.idleTimeout = Duration(seconds: 5);
-      var uri = Uri.parse("https://flutter.dev");
-      var request = await httpClient.getUrl(uri);
-      request.headers.add("user-agent", "Custom-UA");
-      var response = await request.close();
-      print('Response code: ${response.statusCode}');
-      print(await response.transform(utf8.decoder).join());
-
-      var resp = await response.transform(utf8.decoder).join();
-    } catch (e) {
-      print('Error : $e');
-    }
+  fileDemo() {
+    _readFileContent().then((value) {
+      print('before:$value');
+      _writeFileContent('$value .').then((_) {
+        _readFileContent().then((value) {
+          print('after:$value');
+        });
+      });
+    });
   }
 
-  httpDemo() async {
-    try {
-      var client = http.Client();
-      var uri = Uri.parse("https://flutter.dev");
-      http.Response response =
-          await client.get(uri, headers: {"user_agent": "Custom-UA"});
-      print('Respone code: ${response.statusCode}');
-      print(response.body);
-    } catch (e) {
-      print('Error : $s');
-    }
+  Future<File> get _localFile async {
+    final directory = await getApplicationDocumentsDirectory();
+    final path = directory.path;
+    return File('$path/content.txt');
   }
 
-  dioDemo() async {
-    try {
-      Dio dio = new Dio();
-      var response = await dio.get("https://flutter.dev",
-          options: Options(headers: {"user_agent": "Custom-UA"}));
+  Future<File> _writeFileContent(String content) async {
+    final file = await _localFile;
+    return file.writeAsString(content);
+  }
 
-      print(response.data.toString());
+  Future<String> _readFileContent() async {
+    try {
+      final file = await _localFile;
+      String contents = await file.readAsString();
+      return contents;
     } catch (e) {
-      print('Error:$e');
+      return "";
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            RaisedButton(
-              child: Text('HttpClient demo'),
-              onPressed: () => Future(httpClientDemo),
-            ),
-            RaisedButton(
-              child: Text('http demo'),
-              onPressed: () => httpDemo()(),
-            ),
-            RaisedButton(
-              child: Text('Dio demo'),
-              onPressed: () => dioDemo(),
-            ),
-            RaisedButton(
-              child: Text('Dio 并发demo'),
-              onPressed: () => dioParallDemo(),
-            ),
-            RaisedButton(
-              child: Text('Dio 拦截'),
-              onPressed: () => dioInterceptorReject(),
-            ),
-            RaisedButton(
-              child: Text('Dio 缓存'),
-              onPressed: () => dioIntercepterCache(),
-            ),
-            RaisedButton(
-              child: Text('Dio 自定义header'),
-              onPressed: () => dioIntercepterCustomHeader(),
-            ),
-            RaisedButton(
-              child: Text('JSON解析demo'),
-              onPressed: () => jsonParseDemo(),
-            )
-          ],
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-      ),
-    );
+        body: Center(
+          child: Column(
+            children: <Widget>[
+              RaisedButton(
+                onPressed: () => fileDemo(),
+                child: Text('文件 demo'),
+              ),
+              RaisedButton(
+                child: Text('SharedPreference Demo'),
+                onPressed: () => spDemo(),
+              ),
+              RaisedButton(
+                child: Text('数据库 demo'),
+                onPressed: () => dbDemo(),
+              )
+            ],
+          ),
+        ));
   }
 
-  dioParallDemo() async {
-    try {
-      Dio dio = new Dio();
-      List<Response> responseX = await Future.wait([
-        dio.get("https://flutter.dev"),
-        dio.get("https://pub.dev/packages/dio")
-      ]);
-      print("Response1: ${responseX[0].toString()}");
-      print("Response2: ${responseX[1].toString()}");
-    } catch (e) {
-      print('Error:$e');
-    }
-  }
-
-  dioInterceptorReject() async {
-    Dio dio = new Dio();
-    dio.interceptors
-        .add(InterceptorsWrapper(onRequest: (RequestOptions options) {
-      return dio.reject("Error：拦截的原因");
-    }));
-
-    try {
-      var response = await dio.get("https://flutter.dev");
-      print(response.data.toString());
-    } catch (e) {
-      print('Error:$e');
-    }
-  }
-
-  dioIntercepterCache() async {
-    Dio dio = new Dio();
-    dio.interceptors.add(InterceptorsWrapper(onRequest: (options) {
-      return dio.resolve("返回缓存数据");
-    }));
-    try {
-      var response = await dio.get("https//flutter.dev");
-      print(response.data.toString());
-    } catch (e) {
-      print('Error $e');
-    }
-  }
-
-  dioIntercepterCustomHeader() async {
-    Dio dio = new Dio();
-    dio.interceptors.add(InterceptorsWrapper(onRequest: (options) {
-      options.headers["user-agent"] = "Custom-UA";
-      return options;
-    }));
-
-    try {
-      var response = await dio.get("https://flutter.dev");
-      print(response.data.toString());
-    } catch (e) {
-      print('Error:$e');
-    }
-  }
-
-  jsonParseDemo() {
-    loadStudent().then((s) {
-      String content = '''
-      name: ${s.name}
-      score:${s.score}
-      teacher:${s.teacher.name}
-      ''';
-      print(content);
+  spDemo() {
+    _readSPCounter().then((value){
+      print('before:$value');
+      _writeSPCounter().then((_){
+        _readSPCounter().then((value)=>print('after:$value'));
+      });
     });
   }
 
-  String jsonString = '''
-    {
-      "id":"123",
-      "name":"张三",
-      "score" : 95,
-      "teacher": 
-         {
-           "name": "李四",
-           "age" : 40
-         }
-    }
-    ''';
-
-  loadStudent() {
-    return compute(parseStudent, jsonString);
+  Future<int> _readSPCounter() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int counter = (prefs.getInt('counter') ?? 0);
+    return counter;
   }
 
-  static Student parseStudent(String content) {
-    final jsonResponse = json.decode(content);
-    Student student = Student.fromJson(jsonResponse);
-    return student;
+  Future<void> _writeSPCounter() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int counter = (prefs.getInt('counter')??0 )+1;
+    prefs.setInt('counter', counter);
+  }
+
+  int studentID = 123;
+  dbDemo() async{
+    final Future<Database> database = openDatabase(
+      join(await getDatabasesPath(), 'students_database.db'),
+      onCreate: (db, version)=>db.execute('CREATE TABLE students(id TEXT PRIMARY KEY, name TEXT, score INTEGER)'),
+      onUpgrade: (db, oldVersion, newVersion){
+        print('old:$oldVersion, new:$newVersion');
+      },
+      version: 1,
+    );
+
+    Future<void> insertStudent(Student std) async {
+      final Database db = await database;
+      await db.insert('students', std.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace
+      );
+    }
+
+    Future<List<Student>> students() async {
+      final Database db = await database;
+      final List<Map<String, dynamic>> maps = await db.query('students');
+      return List.generate(maps.length, (i)=>Student.fromJson(maps[i]));
+    }
+
+    var student1 = Student(id: '${++studentID}', name: '张三', score: 90);
+    var student2 = Student(id: '${++studentID}', name: '李四', score: 80);
+    var student3 = Student(id: '${++studentID}', name: '王五', score: 85);
+
+    await insertStudent(student1);
+    await insertStudent(student2);
+    await insertStudent(student3);
+
+    students().then((list)=>list.forEach((s)=>print('id:${s.id},name:${s.name}')));
+
+    final Database db = await database;
+    db.close();
   }
 }
 
@@ -219,26 +153,19 @@ class Student {
   String id;
   String name;
   int score;
-  Teacher teacher;
 
-  Student({this.id, this.name, this.score, this.teacher});
+  Student({this.id, this.name, this.score});
 
-  factory Student.fromJson(Map<String, dynamic> parsedJson) {
+  factory Student.fromJson(Map<String, dynamic> parsedJson){
     return Student(
-        id: parsedJson['id'],
-        name: parsedJson['name'],
-        score: parsedJson['score'],
-        teacher: Teacher.fromJson(parsedJson['teacher']));
+      id:parsedJson['id'],
+      name: parsedJson['name'],
+      score: parsedJson['score'],
+    );
   }
-}
 
-class Teacher {
-  String name;
-  int age;
-
-  Teacher({this.name, this.age});
-
-  factory Teacher.fromJson(Map<String, dynamic> parsedJson) {
-    return Teacher(name: parsedJson['name'], age: parsedJson['age']);
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'name': name, 'score': score,};
   }
+
 }
