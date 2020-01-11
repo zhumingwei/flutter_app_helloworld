@@ -1,45 +1,136 @@
-import 'dart:ui';
-
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_library/turnbox.dart';
 
-void main() => runApp(_widgetForRoute(window.defaultRouteName));
+import 'transition.dart';
 
-Widget _widgetForRoute(String route) {
-  switch(route) {
-    default:
-      return MyApp();
-  }
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or press Run > Flutter Hot Reload in a Flutter IDE). Notice that the
-        // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.blue,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: MyHomePage(
+          title: "Flutter Demo Home Page",
+        ));
+  }
+}
+
+const platform = MethodChannel('samples.chenhang/navigation');
+
+class MyHomePage extends StatelessWidget {
+  final String title;
+
+  MyHomePage({this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.yellowAccent,
+      appBar: AppBar(title: Text("Default Page")),
+      body: Center(
+        child: TurnBoxRoute(),
       ),
-      home: Scaffold(
-        backgroundColor: const Color(0xFFD63031), //ARGB红色
-        body: Center(
-          child: Text(
-            'Hello from Flutter',
-            textDirection: TextDirection.ltr,
-            style: TextStyle(
-              fontSize: 20.0,
-              color: Colors.blue,
+    );
+  }
+}
+
+//rotate
+
+class TurnBoxRoute extends StatefulWidget {
+  @override
+  _TurnBoxRouteState createState() => new _TurnBoxRouteState();
+}
+
+class _TurnBoxRouteState extends State<TurnBoxRoute> {
+  double _turns = .0;
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Center(
+      child: Column(
+        children: <Widget>[
+          TurnBox(
+            turns: _turns,
+            speed: 500,
+            child: Icon(Icons.refresh, size: 50,),
+          ),
+          TurnBox(
+            turns: _turns,
+            speed: 1000,
+            child: Icon(Icons.refresh, size: 150.0,),
+          ),
+          RaisedButton(
+            child: Text("顺时针旋转1/5圈"),
+            onPressed: () {
+              setState(() {
+                _turns += .2;
+              });
+            },
+          ),
+          RaisedButton(
+            child: Text("逆时针旋转1/5圈"),
+            onPressed: () {
+              setState(() {
+                _turns -= .2;
+              });
+            },
+          )
+        ],
+      ),
+    );
+  }
+}
+//rotate
+
+
+
+
+
+class AnimatedSwitcherCounterRoute extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _AnimatedSwitcherCounterRouteState();
+}
+
+class _AnimatedSwitcherCounterRouteState
+    extends State<AnimatedSwitcherCounterRoute> {
+  int _count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 500),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              var tween = Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
+              return MySlideTransition(
+                child: child,
+                position: tween.animate(animation),
+              );
+            },
+            child: Text(
+              '$_count',
+              key: ValueKey(_count),
+              style: Theme.of(context).textTheme.display1,
             ),
           ),
-        ),
+          RaisedButton(
+            child: const Text('+1'),
+            onPressed: () {
+              setState(() {
+                _count += 1;
+              });
+            },
+          ),
+        ],
       ),
     );
   }
