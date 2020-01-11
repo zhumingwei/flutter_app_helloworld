@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_hello/transition.dart';
 
 void main() => runApp(MyApp());
 
@@ -45,6 +45,7 @@ class AnimatedSwitcherCounterRoute extends StatefulWidget {
 class _AnimatedSwitcherCounterRouteState
     extends State<AnimatedSwitcherCounterRoute> {
   int _count = 0;
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -54,21 +55,23 @@ class _AnimatedSwitcherCounterRouteState
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 500),
             transitionBuilder: (Widget child, Animation<double> animation) {
-              return ScaleTransition(
+              var tween = Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
+              return MySlideTransition(
                 child: child,
-                scale: animation,
+                position: tween.animate(animation),
               );
             },
-            child: Text('$_count',
-            key: ValueKey(_count),
+            child: Text(
+              '$_count',
+              key: ValueKey(_count),
               style: Theme.of(context).textTheme.display1,
             ),
           ),
           RaisedButton(
             child: const Text('+1'),
-            onPressed: (){
+            onPressed: () {
               setState(() {
-                _count+=1;
+                _count += 1;
               });
             },
           ),
