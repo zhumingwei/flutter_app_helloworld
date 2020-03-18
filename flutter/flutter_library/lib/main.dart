@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_library/turnbox.dart';
@@ -33,105 +36,74 @@ class MyHomePage extends StatelessWidget {
       backgroundColor: Colors.yellowAccent,
       appBar: AppBar(title: Text("Default Page")),
       body: Center(
-        child: TurnBoxRoute(),
+        child: _buildCustomPaint(),
       ),
+    );
+  }
+
+  Widget _buildCustomPaint() {
+    return CustomPaint(
+      size: Size(300, 300),
+      painter: MyPainter(),
+      child: null,
     );
   }
 }
 
-//rotate
-
-class TurnBoxRoute extends StatefulWidget {
+class MyPainter extends CustomPainter {
   @override
-  _TurnBoxRouteState createState() => new _TurnBoxRouteState();
-}
+  void paint(Canvas canvas, Size size) {
+    double eWidth = size.width / 15;
+    double eHeight = size.height / 15;
 
-class _TurnBoxRouteState extends State<TurnBoxRoute> {
-  double _turns = .0;
+    //画棋盘背景
+    var paint = Paint()
+      ..isAntiAlias = true
+      ..style = PaintingStyle.fill //填充
+      ..color = Color(0x77cdb175); //背景为纸黄色
+    canvas.drawRect(Offset.zero & size, paint);
 
-  @override
-  Widget build(BuildContext context) {
+    //画棋盘网格
+    paint
+      ..style = PaintingStyle.stroke //线
+      ..color = Colors.black87
+      ..strokeWidth = 1.0;
 
-    return Center(
-      child: Column(
-        children: <Widget>[
-          TurnBox(
-            turns: _turns,
-            speed: 500,
-            child: Icon(Icons.refresh, size: 50,),
-          ),
-          TurnBox(
-            turns: _turns,
-            speed: 1000,
-            child: Icon(Icons.refresh, size: 150.0,),
-          ),
-          RaisedButton(
-            child: Text("顺时针旋转1/5圈"),
-            onPressed: () {
-              setState(() {
-                _turns += .2;
-              });
-            },
-          ),
-          RaisedButton(
-            child: Text("逆时针旋转1/5圈"),
-            onPressed: () {
-              setState(() {
-                _turns -= .2;
-              });
-            },
-          )
-        ],
-      ),
+    for (int i = 0; i <= 15; ++i) {
+      double dy = eHeight * i;
+      canvas.drawLine(Offset(0, dy), Offset(size.width, dy), paint);
+    }
+
+    for (int i = 0; i <= 15; ++i) {
+      double dx = eWidth * i;
+      canvas.drawLine(Offset(dx, 0), Offset(dx, size.height), paint);
+    }
+
+    //画一个黑子
+    paint
+      ..style = PaintingStyle.fill
+      ..color = Colors.black;
+    canvas.drawCircle(
+      Offset(size.width / 2 - eWidth / 2, size.height / 2 - eHeight / 2),
+      min(eWidth / 2, eHeight / 2) - 2,
+      paint,
+    );
+
+    //画一个白子
+    paint.color = Colors.white;
+    canvas.drawCircle(
+      Offset(size.width / 2 + eWidth / 2, size.height / 2 - eHeight / 2),
+      min(eWidth / 2, eHeight / 2) - 2,
+      paint,
     );
   }
-}
-//rotate
-
-
-
-
-
-class AnimatedSwitcherCounterRoute extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _AnimatedSwitcherCounterRouteState();
-}
-
-class _AnimatedSwitcherCounterRouteState
-    extends State<AnimatedSwitcherCounterRoute> {
-  int _count = 0;
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 500),
-            transitionBuilder: (Widget child, Animation<double> animation) {
-              var tween = Tween<Offset>(begin: Offset(1, 0), end: Offset(0, 0));
-              return MySlideTransition(
-                child: child,
-                position: tween.animate(animation),
-              );
-            },
-            child: Text(
-              '$_count',
-              key: ValueKey(_count),
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ),
-          RaisedButton(
-            child: const Text('+1'),
-            onPressed: () {
-              setState(() {
-                _count += 1;
-              });
-            },
-          ),
-        ],
-      ),
-    );
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
   }
+
 }
+
+
+
